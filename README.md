@@ -1,112 +1,210 @@
-# URL Shortener
+# 🔗 Scalable URL Shortener
 
-A REST API built with Spring Boot that shortens long URLs into compact, shareable links.
+A production-ready URL shortening service built using **Java, Spring Boot, MySQL, and Redis**, designed with scalability, performance, and clean backend architecture in mind.
 
-## Features
+---
 
-- Shorten any valid URL into a short key using Base62 encoding
-- Redirect short URLs to their original destination
-- Redis caching for fast redirects
-- Rate limiting — max 10 requests per minute per IP
-- Input validation
-- Fully Dockerized — runs on any machine with Docker installed
+## 🚀 Features
 
-## Tech Stack
+* 🔗 Shorten long URLs into compact Base62 encoded links
+* ⚡ Fast redirection using Redis caching (Cache-Aside pattern)
+* 🗄️ Persistent storage with MySQL
+* 🔁 Idempotent URL generation (same URL → same short link)
+* 🛡️ Input validation with clean error responses
+* 📄 API documentation with Swagger UI
+* 🐳 Fully containerized using Docker Compose
 
-- Java 21
-- Spring Boot 3
-- MySQL 8
-- Redis
-- Docker & Docker Compose
-- Swagger UI (API docs)
+---
 
-## Getting Started
+## 🧠 System Design Overview
+
+### Flow:
+
+1. User submits a long URL
+2. Backend checks if URL already exists
+3. If not:
+
+   * Save URL → get DB ID
+   * Convert ID → Base62 short key
+4. Store mapping in MySQL
+5. Cache result in Redis
+
+### Redirection:
+
+* First request → DB lookup → cache in Redis
+* Subsequent requests → served from Redis (low latency ⚡)
+
+---
+
+## 🏗️ Tech Stack
+
+* **Backend:** Java, Spring Boot
+* **Database:** MySQL
+* **Cache:** Redis
+* **ORM:** Spring Data JPA (Hibernate)
+* **Build Tool:** Maven
+* **Containerization:** Docker & Docker Compose
+* **API Docs:** Swagger (OpenAPI)
+
+---
+
+## ⚙️ Getting Started
 
 ### Prerequisites
 
-- Docker Desktop installed — nothing else required
+* Docker Desktop installed
+* No need to install Java, MySQL, or Redis manually
 
-### Steps
+---
 
-1. Clone the repository
+### 🧱 Steps to Run
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Devencloud/url-shortener.git
 cd url-shortener
 ```
 
-2. Create your `application.properties` from the example file
+---
+
+#### 2. Create `.env` file
+
+On Mac/Linux:
 
 ```bash
-cp src/main/resources/application.properties.example src/main/resources/application.properties
+cp .env.example .env
 ```
 
-3. Fill in your credentials in `application.properties` — make sure they match `docker-compose.yml`
+On Windows:
 
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/url_shortener
-spring.datasource.username=root
-spring.datasource.password=your_password
-spring.data.redis.host=localhost
-spring.data.redis.port=6379
+```bash
+copy .env.example .env
 ```
 
-4. Run the app
+👉 Default values are already configured — no changes needed.
+
+---
+
+#### 3. Run the application
 
 ```bash
 docker compose up --build
 ```
 
-Docker will automatically set up MySQL, Redis, and the Spring Boot app.
+This will start:
 
-## API Endpoints
+* Spring Boot app
+* MySQL database
+* Redis cache
 
-### Shorten a URL
-```
-POST /api/shorten
-```
-Request body:
-```json
-{
-  "originalUrl": "https://www.example.com"
-}
-```
-Response:
-```
-http://localhost:8080/r/aB3k
-```
+---
 
-### Redirect to original URL
-```
-GET /r/{shortKey}
-```
-Redirects to the original URL. Returns `404` if the short key does not exist.
+#### 4. Access the application
 
-## API Documentation
+* API Base URL:
 
-Swagger UI is available at:
-```
-http://localhost:8080/swagger-ui/index.html
-```
+  ```
+  http://localhost:8080
+  ```
 
-## Rate Limiting
+* Swagger UI:
 
-Each IP address is limited to **10 requests per minute**. Exceeding this returns:
-```json
-{
-  "error": "Too many requests. Max 10 requests per minute."
-}
-```
+  ```
+  http://localhost:8080/swagger-ui/index.html
+  ```
 
-## How It Works
+---
 
-1. A long URL is received and saved to MySQL
-2. The database ID is encoded using Base62 to generate a unique short key
-3. On redirect, the short key is first looked up in Redis (cache)
-4. If not found in cache, it falls back to MySQL and caches the result for 10 minutes
-
-## Stopping the App
+#### 5. Stop the application
 
 ```bash
 docker compose down
 ```
+
+---
+
+## 📌 API Endpoints
+
+### 🔗 Shorten URL
+
+```http
+POST /api/shorten
+```
+
+**Request:**
+
+```json
+{
+  "originalUrl": "https://example.com"
+}
+```
+
+**Response:**
+
+```
+http://localhost:8080/r/{shortKey}
+```
+
+---
+
+### 🔁 Redirect
+
+```http
+GET /r/{shortKey}
+```
+
+Redirects to the original URL.
+
+---
+
+## ⚡ Performance Optimization
+
+* Redis used as a **cache layer**
+* Cache-Aside pattern implemented
+* Reduces DB load significantly
+* Ensures low-latency redirection
+
+---
+
+## 🧪 Validation & Error Handling
+
+* Input validation using `@Valid`, `@NotBlank`, `@Pattern`
+* Centralized exception handling using `@ControllerAdvice`
+* Clean JSON error responses
+
+---
+
+## 🐳 Docker Architecture
+
+The system runs as three containers:
+
+* `app` → Spring Boot backend
+* `mysql` → persistent storage
+* `redis` → caching layer
+
+All services are orchestrated using **Docker Compose**.
+
+---
+
+## 📈 Future Improvements
+
+* Rate limiting (API protection)
+* Analytics (click tracking, geo stats)
+* Custom alias support
+* Link expiration
+* Distributed scaling
+
+---
+
+## 🧾 Project HighLights
+
+> Developed a scalable URL shortening service using Java, Spring Boot, MySQL, and Redis, implementing Base62 encoding and cache-aside strategy to achieve low-latency redirection. Containerized the application using Docker Compose and integrated validation and API documentation for production readiness.
+
+---
+
+## 👨‍💻 Author
+
+**Deven**
+
+---
