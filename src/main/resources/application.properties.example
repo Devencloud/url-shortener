@@ -1,0 +1,13 @@
+spring.application.name=urlshortner
+spring.datasource.url=jdbc:mysql://localhost:3306/your_db
+spring.datasource.username=your_username
+spring.datasource.password=your_password
+
+spring.data.redis.host=localhost
+spring.data.redis.port=6379
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
+springdoc.model-and-view-allowed=false
+springdoc.override-with-generic-response=true
