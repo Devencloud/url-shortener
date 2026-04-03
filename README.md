@@ -1,210 +1,97 @@
-# 🔗 Scalable URL Shortener
+🔗 Scalable URL Shortener
+A production-ready URL shortening service built with Java, Spring Boot, MySQL, and Redis — designed with scalability, performance, and clean backend architecture in mind.
 
-A production-ready URL shortening service built using **Java, Spring Boot, MySQL, and Redis**, designed with scalability, performance, and clean backend architecture in mind.
+🚀 Features
 
----
+🔗 Shorten long URLs into compact Base62 encoded links
+⚡ Fast redirection using Redis caching (Cache-Aside pattern)
+🗄️ Persistent storage with MySQL
+🔁 Idempotent URL generation (same URL → same short link)
+🛡️ Input validation with clean error responses
+🚦 Rate limiting to protect against API abuse
+📄 API documentation via Swagger UI
+🐳 Fully containerized using Docker Compose
 
-## 🚀 Features
 
-* 🔗 Shorten long URLs into compact Base62 encoded links
-* ⚡ Fast redirection using Redis caching (Cache-Aside pattern)
-* 🗄️ Persistent storage with MySQL
-* 🔁 Idempotent URL generation (same URL → same short link)
-* 🛡️ Input validation with clean error responses
-* 📄 API documentation with Swagger UI
-* 🐳 Fully containerized using Docker Compose
+🧠 System Design Overview
+Shortening Flow:
 
----
+User submits a long URL
+Backend checks if the URL already exists
+If not: save URL → get DB ID → convert ID to Base62 short key
+Store mapping in MySQL
+Cache result in Redis
 
-## 🧠 System Design Overview
+Redirection Flow:
 
-### Flow:
+First request → DB lookup → cache in Redis
+Subsequent requests → served directly from Redis ⚡
 
-1. User submits a long URL
-2. Backend checks if URL already exists
-3. If not:
 
-   * Save URL → get DB ID
-   * Convert ID → Base62 short key
-4. Store mapping in MySQL
-5. Cache result in Redis
+🏗️ Tech Stack
+LayerTechnologyBackendJava, Spring BootDatabaseMySQLCacheRedisORMSpring Data JPA (Hibernate)Build ToolMavenContainerizationDocker & Docker ComposeAPI DocsSwagger (OpenAPI)
 
-### Redirection:
+⚙️ Getting Started
+Prerequisites
 
-* First request → DB lookup → cache in Redis
-* Subsequent requests → served from Redis (low latency ⚡)
+Docker Desktop installed
+No need to install Java, MySQL, or Redis manually
 
----
-
-## 🏗️ Tech Stack
-
-* **Backend:** Java, Spring Boot
-* **Database:** MySQL
-* **Cache:** Redis
-* **ORM:** Spring Data JPA (Hibernate)
-* **Build Tool:** Maven
-* **Containerization:** Docker & Docker Compose
-* **API Docs:** Swagger (OpenAPI)
-
----
-
-## ⚙️ Getting Started
-
-### Prerequisites
-
-* Docker Desktop installed
-* No need to install Java, MySQL, or Redis manually
-
----
-
-### 🧱 Steps to Run
-
-#### 1. Clone the repository
-
-```bash
-git clone https://github.com/Devencloud/url-shortener.git
+Steps to Run
+1. Clone the repository
+bashgit clone https://github.com/Devencloud/url-shortener.git
 cd url-shortener
-```
-
----
-
-#### 2. Create `.env` file
-
+2. Create .env file
 On Mac/Linux:
-
-```bash
-cp .env.example .env
-```
-
+bashcp .env.example .env
 On Windows:
+bashcopy .env.example .env
 
-```bash
-copy .env.example .env
-```
+Default values are pre-configured — no changes needed.
 
-👉 Default values are already configured — no changes needed.
+3. Run the application
+bashdocker compose up --build
+This starts three containers: the Spring Boot app, MySQL, and Redis.
+4. Access the application
+ServiceURLAPI Base URLhttp://localhost:8080Swagger UIhttp://localhost:8080/swagger-ui/index.html
+5. Stop the application
+bashdocker compose down
 
----
-
-#### 3. Run the application
-
-```bash
-docker compose up --build
-```
-
-This will start:
-
-* Spring Boot app
-* MySQL database
-* Redis cache
-
----
-
-#### 4. Access the application
-
-* API Base URL:
-
-  ```
-  http://localhost:8080
-  ```
-
-* Swagger UI:
-
-  ```
-  http://localhost:8080/swagger-ui/index.html
-  ```
-
----
-
-#### 5. Stop the application
-
-```bash
-docker compose down
-```
-
----
-
-## 📌 API Endpoints
-
-### 🔗 Shorten URL
-
-```http
+📌 API Endpoints
+🔗 Shorten URL
 POST /api/shorten
-```
-
-**Request:**
-
-```json
-{
+Request:
+json{
   "originalUrl": "https://example.com"
 }
-```
-
-**Response:**
-
-```
+Response:
 http://localhost:8080/r/{shortKey}
-```
-
----
-
-### 🔁 Redirect
-
-```http
+🔁 Redirect
 GET /r/{shortKey}
-```
+Redirects to the original long URL.
 
-Redirects to the original URL.
+⚡ Performance
 
----
+Redis Cache-Aside pattern reduces database load significantly
+Cache hit on subsequent requests ensures low-latency redirection
+Rate limiting prevents abuse and protects backend resources
 
-## ⚡ Performance Optimization
 
-* Redis used as a **cache layer**
-* Cache-Aside pattern implemented
-* Reduces DB load significantly
-* Ensures low-latency redirection
+🛡️ Validation & Error Handling
 
----
+Input validation using @Valid, @NotBlank, @Pattern
+Centralized exception handling via @ControllerAdvice
+Clean, structured JSON error responses
 
-## 🧪 Validation & Error Handling
 
-* Input validation using `@Valid`, `@NotBlank`, `@Pattern`
-* Centralized exception handling using `@ControllerAdvice`
-* Clean JSON error responses
+🐳 Docker Architecture
+ContainerRoleappSpring Boot backendmysqlPersistent storageredisCaching layer
+All services are orchestrated via Docker Compose.
 
----
+🧾 Project Highlights
+Developed a scalable URL shortening service using Java, Spring Boot, MySQL, and Redis — implementing Base62 encoding, a cache-aside caching strategy, and rate limiting to achieve low-latency, abuse-resistant redirection. Containerized with Docker Compose and integrated with Swagger for API documentation and full input validation for production readiness.
 
-## 🐳 Docker Architecture
+👨‍💻 Author
+Deven
+github.com/Devencloud
 
-The system runs as three containers:
-
-* `app` → Spring Boot backend
-* `mysql` → persistent storage
-* `redis` → caching layer
-
-All services are orchestrated using **Docker Compose**.
-
----
-
-## 📈 Future Improvements
-
-* Rate limiting (API protection)
-* Analytics (click tracking, geo stats)
-* Custom alias support
-* Link expiration
-* Distributed scaling
-
----
-
-## 🧾 Project HighLights
-
-> Developed a scalable URL shortening service using Java, Spring Boot, MySQL, and Redis, implementing Base62 encoding and cache-aside strategy to achieve low-latency redirection. Containerized the application using Docker Compose and integrated validation and API documentation for production readiness.
-
----
-
-## 👨‍💻 Author
-
-**Deven**
-
----
