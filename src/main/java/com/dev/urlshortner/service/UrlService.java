@@ -40,21 +40,28 @@ public class UrlService {
   }
 
   public String getOriginalUrl(String shortKey) {
-    String cachedUrl = redisTemplate.opsForValue().get(shortKey);
-    if (cachedUrl != null) {
-      System.out.println("Cache hit:");
-      return cachedUrl;
+    try {
+      String cachedUrl = redisTemplate.opsForValue().get(shortKey);
+      if (cachedUrl != null) {
+        System.out.println("Cache hit:");
+        return cachedUrl;
+      }
+    } catch (Exception e) {
+      System.out.println("Redis unavailable, falling back to DB: " + e.getMessage());
     }
+
     System.out.println("Cache miss: Go to DB");
     Optional<Url> url = urlRepository.findByShortKey(shortKey);
     if (url.isPresent()) {
-
       String originalUrl = url.get().getOriginalUrl();
-      redisTemplate.opsForValue().set(shortKey, originalUrl, 10, TimeUnit.MINUTES);
+      try {
+        redisTemplate.opsForValue().set(shortKey, originalUrl, 10, TimeUnit.MINUTES);
+      } catch (Exception e) {
+        System.out.println("Redis write failed: " + e.getMessage());
+      }
       return originalUrl;
     }
     return null;
-
   }
 
 }
