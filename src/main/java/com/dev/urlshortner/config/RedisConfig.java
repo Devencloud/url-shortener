@@ -24,7 +24,7 @@ public class RedisConfig {
     @Value("${spring.data.redis.password:}")
     private String password;
 
-    @Value("${spring.data.redis.ssl.enabled:false}")
+    @Value("${REDIS_SSL:false}")
     private boolean sslEnabled;
 
     @Bean
